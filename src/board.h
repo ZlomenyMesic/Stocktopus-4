@@ -18,7 +18,7 @@ typedef struct {
 
     Piece** mailbox;
 
-    int* castling_flags;
+    int castling_flags;
     int en_passant_square;
     int number_of_pieces;
 } Board;

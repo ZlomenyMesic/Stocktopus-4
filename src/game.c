@@ -85,10 +85,10 @@ void set_position_fen(const char* fen) {
 
     for (int i = 0; i < strlen(tokens[2]); i++) {
         switch (tokens[2][i]) {
-            case 'K': chessboard->castling_flags[0] = 1; break;
-            case 'Q': chessboard->castling_flags[1] = 1; break;
-            case 'k': chessboard->castling_flags[2] = 1; break;
-            case 'q': chessboard->castling_flags[3] = 1; break;
+            case 'K': chessboard->castling_flags |= 0x01; break;
+            case 'Q': chessboard->castling_flags |= 0x02; break;
+            case 'k': chessboard->castling_flags |= 0x04; break;
+            case 'q': chessboard->castling_flags |= 0x08; break;
             default: if (tokens[2][i] != '-') printf("invalid castling availability: %c\n", tokens[2][i]); break;
         }
     }
@@ -112,6 +112,7 @@ void best_move() {
     int legal_count = get_legal_moves(legal, chessboard, engineColor);
     
     Move* best = legal[rand() % legal_count];
+    perform_move(chessboard, best);
     printf("bestmove %s\n", move_to_string(best));
 }
 
