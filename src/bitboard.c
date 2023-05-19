@@ -6,7 +6,7 @@
 #include "bitboard.h"
 
 int is_bit_set(ulong bitboard, int index) {
-    return (bitboard & (1 << index)) != 0;
+    return (bitboard & ((ulong)1 << index)) != 0;
 }
 
 int bit_scan_forward(ulong bitboard) {
@@ -15,7 +15,7 @@ int bit_scan_forward(ulong bitboard) {
 
 int bit_scan_forward_reset(ulong* bitboard) {
     int index = __builtin_ffsll((long long)*bitboard) - 1;
-    *bitboard ^= (1 << index);
+    *bitboard ^= ((ulong)1 << index);
     return index;
 }
 

@@ -11,15 +11,15 @@
 typedef struct {
     int start, end;
 
-    Piece piece;
+    PieceType piece;
     PieceType capture;
     PieceType promotion;
 } Move;
 
-Move* move_new(int start, int end, PieceType piece, PieceType capture, Piece promotion);
+Move* move_new(int start, int end, PieceType piece, PieceType capture, PieceType promotion);
 void move_destruct(Move* move);
 
 Move* string_to_move(char* move, Piece** mailbox);
-void move_to_string(const Move* move, char* dest);
+char* move_to_string(const Move* move);
 
 #endif

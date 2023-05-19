@@ -14,8 +14,9 @@ Board* board_new() {
     for (int i = 0; i < 64; i++) {
         board->mailbox[i] = piece_new(Color_NONE, PieceType_NONE);
     }
-    board->white_pieces = malloc(6 * sizeof(ulong));
-    board->black_pieces = malloc(6 * sizeof(ulong));
+    board->pieces = malloc(2 * sizeof(ulong*));
+    board->pieces[0] = malloc(6 * sizeof(ulong));
+    board->pieces[1] = malloc(6 * sizeof(ulong));
     board->occupied = malloc(2 * sizeof(ulong));
     board->castling_flags = malloc(4 * sizeof(int));
     return board;
@@ -26,8 +27,9 @@ void board_destruct(Board* board) {
         free(board->mailbox[i]);
     }
     free(board->mailbox);
-    free(board->white_pieces);
-    free(board->black_pieces);
+    free(board->pieces[0]);
+    free(board->pieces[1]);
+    free(board->pieces);
     free(board->occupied);
     free(board->castling_flags);
     free(board);
@@ -57,22 +59,20 @@ void board_print(const Board* board) {
 
 void update_bitboards(Board* board) {
     for (int i = 0; i < 6; i++) {
-        board->white_pieces[i] = 0;
-        board->black_pieces[i] = 0;
+        board->pieces[0][i] = 0;
+        board->pieces[1][i] = 0;
     }
     for (int i = 0; i < 64; i++) {
-        if (board->mailbox[i]->color == Color_WHITE) {
-            board->white_pieces[board->mailbox[i]->pieceType - 1] |= (1 << i);
-        } else if (board->mailbox[i]->color == Color_BLACK) {
-            board->black_pieces[board->mailbox[i]->pieceType - 1] |= (1 << i);
+        if (board->mailbox[i]->pieceType != PieceType_NONE) {
+            board->pieces[board->mailbox[i]->color][board->mailbox[i]->pieceType - 1] |= ((ulong)1 << i);
         }
     }
 
     board->occupied[0] = 0;
     board->occupied[1] = 0;
     for (int i = 0; i < 6; i++) {
-        board->occupied[0] |= board->white_pieces[i];
-        board->occupied[1] |= board->black_pieces[i];
+        board->occupied[0] |= board->pieces[0][i];
+        board->occupied[1] |= board->pieces[1][i];
     }
     board->empty = ~(board->occupied[0] | board->occupied[1]);
 }

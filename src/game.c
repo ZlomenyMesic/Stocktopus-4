@@ -6,29 +6,32 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+
 #include "game.h"
+#include "movegen.h"
+#include "move.h"
 
 Board* chessboard;
 
-void set_position(const char** tokens, int tok_count) {
+void set_position(const char** tokens, int tok_count, int skip) {
     chessboard = board_new();
-    if (tok_count > 1 && strcmp(tokens[1], "startpos") == 0) {
+    if (tok_count > 1 && strcmp(tokens[1 + skip], "startpos") == 0) {
         engineColor = Color_WHITE;
         playerColor = Color_BLACK;
         set_position_fen(STARTPOS_FEN);
-    } else if (strcmp(tokens[1], "fen") == 0) {
+    } else if (strcmp(tokens[1 + skip], "fen") == 0) {
         if (tok_count < 8) {
             printf("missing parameters in: position fen\n");
             return;
         }
-        char* fen = tokens[2];
+        char* fen = tokens[2 + skip];
         for (int i = 3; i < 8; i++) {
             strcat(fen, " ");
-            strcat(fen, tokens[i]);
+            strcat(fen, tokens[i + skip]);
         }
         set_position_fen(fen);
     } else if (tok_count == 1) printf("missing parameters in: position\n");
-    else printf("unknown token: %s\n", tokens[1]);
+    else printf("unknown token: %s\n", tokens[1 + skip]);
 }
 
 void set_position_fen(const char* fen) {
@@ -96,10 +99,24 @@ void set_position_fen(const char* fen) {
     } else if (strcmp(tokens[3], "-") != 0) printf("invalid en passant square: %s\n", tokens[3]);
 
     update_bitboards(chessboard);
+
+    for (int i = 0; i < 6; i++) {
+        free(tokens[i]);
+    }
+    free(tokens);
+    free(current_token);
 }
 
-char* best_move() {
-    return "bestmove e7e5\n";
+void best_move() {
+    Move** legal = malloc(200 * sizeof(Move*));
+    int legal_count = get_legal_moves(legal, chessboard, engineColor);
+    
+    Move* best = legal[rand() % legal_count];
+    printf("bestmove %s\n", move_to_string(best));
+}
+
+void set_option(const char** tokens, int tok_count, int skip) {
+
 }
 
 void new_game() {

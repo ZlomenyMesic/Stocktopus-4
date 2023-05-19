@@ -11,8 +11,7 @@
 #include "move.h"
 
 typedef struct {
-    ulong* white_pieces;
-    ulong* black_pieces;
+    ulong** pieces;
 
     ulong* occupied;
     ulong empty;
