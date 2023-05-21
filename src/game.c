@@ -10,6 +10,7 @@
 #include "game.h"
 #include "movegen.h"
 #include "move.h"
+#include "bitboard.h"
 
 Board* chessboard;
 
@@ -32,6 +33,17 @@ void set_position(const char** tokens, int tok_count, int skip) {
         set_position_fen(fen);
     } else if (tok_count == 1) printf("missing parameters in: position\n");
     else printf("unknown token: %s\n", tokens[1 + skip]);
+
+    int parse_moves = 0;
+    for (int i = 0; i < tok_count; i++) {
+        if (parse_moves) {
+            Move* parsed = string_to_move(tokens[i], chessboard->mailbox);
+            perform_move(chessboard, parsed);
+            engineColor = playerColor;
+            playerColor = engineColor == Color_WHITE ? Color_BLACK : Color_WHITE;
+        }
+        if (!parse_moves && strcmp(tokens[i], "moves") == 0) parse_moves = 1;
+    }
 }
 
 void set_position_fen(const char* fen) {
@@ -110,7 +122,10 @@ void set_position_fen(const char* fen) {
 void best_move() {
     Move** legal = malloc(200 * sizeof(Move*));
     int legal_count = get_legal_moves(legal, chessboard, engineColor);
-    
+
+    board_print(chessboard);
+
+    srand(legal_count * popcount((ulong)&legal_count));
     Move* best = legal[rand() % legal_count];
     perform_move(chessboard, best);
     printf("bestmove %s\n", move_to_string(best));

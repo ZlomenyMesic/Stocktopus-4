@@ -53,12 +53,12 @@ void perform_move(Board* board, const Move* move) {
 
     board->pieces[color][board->mailbox[move->end]->pieceType - 1] ^= from_to_bb;
     board->occupied[color] ^= from_to_bb;
-    board->empty ^= from_bb;
 
     if (move->capture) {
         board->pieces[op_color][move->capture - 1] ^= to_bb;
         board->occupied[op_color] ^= to_bb;
-    } board->empty ^= to_bb;
+        board->empty ^= from_bb;
+    } board->empty ^= from_to_bb;
 
     if (move->promotion == PieceType_PAWN) {
         ulong en_passant_bb = color == Color_WHITE ? to_bb >> 8 : to_bb << 8;
@@ -81,6 +81,8 @@ void perform_move(Board* board, const Move* move) {
         board->pieces[color][0] ^= to_bb;
         board->pieces[color][move->promotion - 1] ^= to_bb;
     }
+
+    update_bitboards(board);
 }
 
 int is_check(const Board* board, Color color) {

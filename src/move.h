@@ -19,7 +19,7 @@ typedef struct {
 Move* move_new(int start, int end, PieceType piece, PieceType capture, PieceType promotion);
 void move_destruct(Move* move);
 
-Move* string_to_move(char* move, Piece** mailbox);
+Move* string_to_move(const char* move, Piece** mailbox);
 char* move_to_string(const Move* move);
 
 #endif
